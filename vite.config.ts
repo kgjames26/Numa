@@ -1,0 +1,4 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
+export default defineConfig({ plugins: [react(), VitePWA({ registerType: 'autoUpdate', includeAssets: ['icon.svg'], manifest: { name: 'NUMA — Budget personnel et familial', short_name: 'NUMA', description: 'Votre argent. Vos choix. Vos projets.', theme_color: '#f7f8f4', background_color: '#f7f8f4', display: 'standalone', start_url: '/', icons: [{ src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }] }, workbox: { navigateFallback: '/index.html', globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] } })], build: { rollupOptions: { output: { manualChunks(id) { if (id.includes('/node_modules/recharts/')) return 'charts'; if (id.includes('/node_modules/d3-')) return 'd3'; if (id.includes('/node_modules/lucide-react/')) return 'icons'; if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'react'; } } } } });
