@@ -27,6 +27,7 @@ Deploy the generated `dist` directory to Vercel. `vercel.json` provides the SPA 
 - Expenses tagged as envelope-funded are excluded from planned expenses; their envelope allocation is counted once.
 - Actual income and expenses are entered in Activity. Actuals are not inferred from forecasts.
 - JSON export/import covers the full local state. CSV export covers ledger entries.
+- Data from the previous NUMA release is migrated from `localStorage` into IndexedDB on first open; old balance snapshots remain visible in the activity history.
 - Use JSON backup to move data between devices. Browser storage can be cleared by the operating system; keep a separate backup for durable retention.
 
 ## Current scope
