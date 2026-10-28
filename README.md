@@ -1,6 +1,6 @@
 # NUMA
 
-NUMA is a local-first, installable budgeting PWA. A new installation starts with an empty budget and a short setup flow. The application stores data in IndexedDB on the current browser/device; there is no account, bank connection, or cloud synchronization.
+NUMA is a local-first, installable budgeting PWA. A new installation starts with an empty budget and a short setup flow. Budgets are always saved in IndexedDB on the current browser/device. Optional Google sign-in and Supabase cloud sync can be enabled for access on multiple devices; the app remains usable offline and never connects to a bank.
 
 ## Run locally
 
@@ -29,6 +29,20 @@ Deploy the generated `dist` directory to Vercel. `vercel.json` provides the SPA 
 - JSON export/import covers the full local state. CSV export covers ledger entries.
 - Data from the previous NUMA release is migrated from `localStorage` into IndexedDB on first open; old balance snapshots remain visible in the activity history.
 - Use JSON backup to move data between devices. Browser storage can be cleared by the operating system; keep a separate backup for durable retention.
+
+## Optional Google account and cloud sync
+
+Cloud sync is disabled until environment variables and the Supabase project are configured. Do not commit secrets.
+
+1. Create a Supabase project and apply `supabase/migrations/202610290001_numa_cloud_sync.sql` in its SQL editor (or with the Supabase CLI).
+2. In Supabase Authentication, enable Google and set the Google OAuth client ID and secret. Add `https://numa-tawny.vercel.app` and the local development origin to the allowed redirect URLs. The Google OAuth callback is the callback URL shown in the Supabase Google provider settings.
+3. In Google Cloud OAuth, set the authorized JavaScript origins to the NUMA site origin and use the Supabase callback URI shown in that provider settings page.
+4. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the Vercel project's Production and Preview environment variables. The public/anon key is intended for the client; never use a service-role key in Vite or the browser.
+5. Redeploy. For local development, copy `.env.example` to `.env.local` and enter the same project URL and public client key.
+
+The migration creates one private JSON budget document per authenticated user, enables row-level security, and grants access only when the authenticated ID matches that row. The database function uses the last-seen update timestamp to reject stale writes instead of silently overwriting a newer device copy. A user must choose which copy to keep when local and cloud budgets have diverged; the local copy can be downloaded as JSON first. Google credentials identify the user only; NUMA does not request access to Drive, Gmail, or banking data.
+
+Until these provider settings and environment variables are supplied, the Google sign-in control stays inactive and all budget data remains local.
 
 ## Current scope
 
